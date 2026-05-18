@@ -1,0 +1,572 @@
+[17/05, 19:53] +55 31 8368-6282: <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Life Med — Agendamento</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="auth-container" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-header">
+        <span class="logo-mark">L</span>
+        <h1 class="logo-text">Life <em>Med</em></h1>
+      </div>
+
+      <div id="signInForm">
+        <h2 class="auth-title">Fazer Login</h2>
+        <p class="auth-subtitle">Acesse sua conta para gerenciar agendamentos</p>
+        
+        <div class="field-group">
+          <label for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" placeholder="Digite seu e-mail">
+        </div>
+        <div class="field-group">
+          <label for="loginSenha">Senha</label>
+          <input type="password" id="loginSenha" placeholder="Digite sua senha">
+        </div>
+        
+        <p id="authLoginError" class="error-msg" style="margin-bottom: 10px; text-align: center;"></p>
+
+        <button type="button" class="btn btn--primary btn--full" onclick="fazerLogin()">Entrar</button>
+        <p class="auth-switch">Não tem uma conta? <a href="#" onclick="toggleAuthMode(true)">Cadastre-se</a></p>
+      </div>
+
+      <div id="signUpForm" style="display: none;">
+        <h2 class="auth-title">Criar Conta</h2>
+        <p class="auth-subtitle">Preencha os campos para começar</p>
+        
+        <div class="field-group">
+          <label for="registerName">Nome Completo</label>
+          <input type="text" id="registerName" placeholder="Ex: Maria Silva">
+        </div>
+        <div class="field-group">
+          <label for="registerEmail">E-mail</label>
+          <input type="email" id="registerEmail" placeholder="maria@email.com">
+        </div>
+        <div class="field-group">
+          <label for="registerSenha">Senha</label>
+          <input type="password" id="registerSenha" placeholder="Crie uma senha">
+        </div>
+        
+        <p id="authRegisterError" class="error-msg" style="margin-bottom: 10px; text-align: center;"></p>
+
+        <button type="button" class="btn btn--primary btn--full" onclick="fazerCadastro()">Cadastrar</button>
+        <p class="auth-switch">Já tem uma conta? <a href="#" onclick="toggleAuthMode(false)">Faça Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <aside class="sidebar" id="sidebar" style="display: none;">
+    <div class="sidebar__logo">
+      <span class="logo-mark">L</span>
+      <span class="logo-text">Life <em>Med</em></span>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="#" class="nav-item active">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendar
+      </a>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Configurações
+
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar">US</div>
+      <div class="sidebar__user">
+        <span class="user-name">Paciente</span>
+        <span class="user-role">Perfil</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main" id="mainSystem" style="display: none;">
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Marque Sua Consulta</h1>
+        <p class="page-subtitle">Preencha os dados abaixo para agendar sua consulta</p>
+      </div>
+     
+    </header>
+
+    <div class="content-grid">
+      <section class="form-card">
+        <div class="steps">
+          <div class="step active" data-step="1">
+            <span class="step__num">1</span>
+            <span class="step__label">Paciente</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <span class="step__num">2</span>
+            <span class="step__label">Especialidade</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <span class="step__num">3</span>
+            <span class="step__label">Data &amp; Hora</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="4">
+            <span class="step__num">4</span>
+            <span class="step__label">Confirmar</span>
+          </div>
+        </div>
+
+        <form id="appointmentForm" novalidate>
+          <fieldset class="form-step active" id="step1">
+            <legend class="sr-only">Dados do Paciente</legend>
+
+            <div class="field-group">
+              <label for="patientName">Nome completo</label>
+              <input type="text" id="patientName" placeholder="Ex.: Maria Silva" autocomplete="name" required/>
+              <p id="nameError" class="error-msg"></p>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="patientDOB">Data de nascimento</label>
+                <input type="date" id="patientDOB" required/>
+                <p id="dobError" class="error-msg"></p>
+              </div>
+              <div class="field-group">
+                <label for="patientPhone">Telefone</label>
+                <input type="tel" id="patientPhone" placeholder="(31) 90000-0000" oninput="mascaraTelefone(this)" required/>
+                <p id="phoneError" class="error-msg"></p>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="patientEmail">E-mail</label>
+              <input type="email" id="patientEmail" placeholder="maria@email.com" autocomplete="email"/>
+              <p id="emailError" class="error-msg"></p>
+            </div>
+
+            <div class="field-group">
+              <label for="patientCPF">CPF</label>
+              <input type="text" id="patientCPF" placeholder="000.000.000-00" oninput="mascaraCPF(this)" required/>
+              <p id="cpfError" class="error-msg"></p> 
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn--primary" onclick="goStep(2)">Próximo →</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step" id="step2" style="display: none;">
+            <legend class="sr-only">Especialidade e Médico</legend>
+            <div class="field-group">
+              <label>Especialidade</label>
+              <div class="specialty-grid">
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="clinico" checked/>
+                  <span class="specialty-card__icon">🧬</span>
+                  <span>Clínico Geral</span>
+                </label>
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="cardio"/>
+                  <span class="specialty-card__icon">🫀</span>
+                  <span>Cardiologia</span>
+                </label>
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="derma"/>
+                  <span class="specialty-card__icon">🧬</span>
+                  <span>Dermatologia</span>
+                </label>
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="ortho"/>
+                  <span class="specialty-card__icon">🦴</span>
+                  <span>Ortopedia</span>
+                </label>
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="oftalmo"/>
+                  <span class="specialty-card__icon">👁️</span>
+                  <span>Oftalmologia</span>
+                </label>
+                <label class="specialty-card">
+                  <input type="radio" name="specialty" value="pediatria"/>
+                  <span class="specialty-card__icon">👶</span>
+                  <span>Pediatria</span>              
+                </label>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="doctor">Médico responsável</label>
+              <select id="doctor" required>
+                <option value="">Selecione um médico...</option>
+                <option>Dr. André Costa — Clínico Geral</option>
+                <option>Dra. Camila Rocha — Cardiologista</option>
+                <option>Dr. Felipe Mendes — Dermatologista</option>
+                <option>Dra. Laura Ferreira — Ortopedista</option>   
+                <option>Dr. Lucas Almeida — Oftalmologista</option>
+                <option>Dra. Sofia Martins — Pediatra</option>           
+              </select>
+             <p id="doctorError" class="error-msg"></p>
+            </div>
+
+            <div class="field-group">
+              <label for="consultType">Tipo de consulta</label>
+              <div class="toggle-group">
+                <label class="toggle-opt">
+                  <input type="radio" name="consultType" value="presencial" checked/>
+                  <span>Presencial</span>
+                </label>
+                <label class="toggle-opt">
+                  <input type="radio" name="consultType" value="online"/>
+                  <span>Teleconsulta</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn--ghost" onclick="goStep(1)">← Voltar</button>
+              <button type="button" class="btn btn--primary" onclick="goStep(3)">Próximo →</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step" id="step3" style="display: none;">
+            <legend class="sr-only">Data e Hora</legend>
+            <div class="field-row">
+              <div class="field-group">
+                <label for="consultDate">Data da consulta</label>
+                <input type="date" id="consultDate" required/>
+                <p id="dateError" class="error-msg"></p>
+              </div>
+              <div class="field-group">
+                <label for="consultTime">Horário</label>
+                <select id="consultTime" required>
+                  <option value="">Selecione...</option>
+                  <option>07:30</option>
+                  <option>08:00</option>
+                  <option>08:30</option>
+                  <option>09:00</option>
+                  <option>09:30</option>
+                  <option>10:00</option>
+                  <option>10:30</option>
+                  <option>14:00</option>
+                  <option>14:30</option>
+                  <option>15:00</option>
+                  <option>15:30</option>
+                  <option>16:00</option>
+                </select>
+                <p id="timeError" class="error-msg"></p>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="notes">Observações / Sintomas (opcional)</label>
+              <textarea id="notes" rows="4" placeholder="Descreva brevemente o motivo da consulta..."></textarea>
+            </div>
+
+            <div class="field-actions step-actions">
+              <button type="button" class="btn btn--ghost" onclick="goStep(2)">← Voltar</button>
+              <button type="button" class="btn btn--primary" onclick="goStep(4)">Revisar →</button>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step" id="step4" style="display: none;">
+            <legend class="sr-only">Confirmação</legend>
+            <div class="review-card">
+              <div class="review-section">
+                <span class="review-tag">Paciente</span>
+                <dl class="review-dl">
+                  <div><dt>Nome</dt><dd id="rev-name">—</dd></div>
+                  <div><dt>Telefone</dt><dd id="rev-phone">—</dd></div>
+                  <div><dt>E-mail</dt><dd id="rev-email">—</dd></div>
+                  <div><dt>CPF</dt><dd id="rev-cpf">—</dd></div>
+                </dl>
+              </div>
+              <div class="review-section">
+                <span class="review-tag">Consulta</span>
+                <dl class="review-dl">
+                  <div><dt>Especialidade</dt><dd id="rev-specialty">—</dd></div>
+                  <div><dt>Médico</dt><dd id="rev-doctor">—</dd></div>
+                  <div><dt>Tipo</dt><dd id="rev-type">—</dd></div>
+                  <div><dt>Data</dt><dd id="rev-date">—</dd></div>
+                  <div><dt>Horário</dt><dd id="rev-time">—</dd></div>
+                </dl>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn--ghost" onclick="goStep(3)">← Voltar</button>
+              <button type="button" class="btn btn--confirm" onclick="finalizarAgendamento()">✓ Confirmar Agendamento</button>
+            </div>
+          </fieldset>
+        </form>
+
+        <div class="success-msg" id="successMsg" style="display: none;">
+          <div class="success-icon">✓</div>
+          <h2>Consulta agendada!</h2>
+          <p>Você receberá uma confirmação em breve.</p>
+          <button type="button" class="btn btn--primary" onclick="resetForm()">Novo agendamento</button>
+        </div>
+      </section>
+
+      <aside class="info-sidebar">
+        <h2 class="info-title">Dicas para um agendamento eficiente</h2>
+        <ul class="info-list">
+          <li> Tenha em mãos seus documentos pessoais e cartão do plano de saúde (se aplicável). </li>
+
+          <li> Descreva claramente seus sintomas e histórico médico para ajudar na escolha da especialidade. </li>
+
+          <li> Escolha um horário que se encaixe na sua rotina para evitar faltas ou atrasos. </li>
+
+          <li> Revise as informações antes de confirmar para garantir que tudo está correto. </li>
+
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+[17/05, 19:54] +55 31 8368-6282: let usuariosCadastrados = JSON.parse(localStorage.getItem("usuariosCadastrados")) || [
+  { email: "user@lifemed.com", senha: "123", nome: "LifeMed user" }
+];
+
+function toggleAuthMode(isRegistering) {
+  const signInForm = document.getElementById("signInForm");
+  const signUpForm = document.getElementById("signUpForm");
+  
+  document.getElementById("authLoginError").innerText = "";
+  document.getElementById("authRegisterError").innerText = "";
+
+  if (isRegistering) {
+    signInForm.style.display = "none";
+    signUpForm.style.display = "block";
+  } else {
+    signInForm.style.display = "block";
+    signUpForm.style.display = "none";
+  }
+}
+
+function fazerLogin() {
+  const emailInput = document.getElementById("loginEmail").value.trim();
+  const senhaInput = document.getElementById("loginSenha").value;
+  const errorElement = document.getElementById("authLoginError");
+
+  errorElement.innerText = "";
+
+  if (!emailInput || !senhaInput) {
+    errorElement.innerText = "Por favor, preencha todos os campos.";
+    return;
+  }
+
+  const usuarioValido = usuariosCadastrados.find(
+    u => u.email.toLowerCase() === emailInput.toLowerCase() && u.senha === senhaInput
+  );
+
+  if (usuarioValido) {
+    // Injeta os dados do usuário logado diretamente nos campos do seu HTML
+    document.querySelector(".user-name").innerText = usuarioValido.nome;
+    document.getElementById("patientName").value = usuarioValido.nome;
+    document.getElementById("patientEmail").value = usuarioValido.email;
+
+    // Esconde a tela de login e mostra o sistema
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("mainSystem").style.display = "block";
+    document.getElementById("sidebar").style.display = "flex";
+  } else {
+    errorElement.innerText = "E-mail ou senha incorretos.";
+  }
+}
+
+function fazerCadastro() {
+  const nome = document.getElementById("registerName").value.trim();
+  const email = document.getElementById("registerEmail").value.trim();
+  const senha = document.getElementById("registerSenha").value;
+  const errorElement = document.getElementById("authRegisterError");
+
+  errorElement.innerText = "";
+
+  if (!nome || !email || !senha) {
+    errorElement.innerText = "Por favor, preencha todos os campos.";
+    return;
+  }
+
+  const emailExiste = usuariosCadastrados.some(u => u.email.toLowerCase() === email.toLowerCase());
+  if (emailExiste) {
+    errorElement.innerText = "Este e-mail já está cadastrado.";
+    return;
+  }
+
+  // Adiciona no array temporário
+  usuariosCadastrados.push({ nome, email, senha });
+  
+  // ATUALIZA O BANCO DE DADOS (Grava permanentemente no navegador)
+  localStorage.setItem("usuariosCadastrados", JSON.stringify(usuariosCadastrados));
+  
+  // Volta para a tela de login com mensagem de sucesso
+  toggleAuthMode(false);
+  document.getElementById("authLoginError").style.color = "var(--teal-400)";
+  document.getElementById("authLoginError").innerText = "Conta criada! Faça seu login.";
+  
+  setTimeout(() => {
+    document.getElementById("authLoginError").style.color = "";
+  }, 4000);
+}
+
+let etapaAtual = 1;
+
+function goStep(step) {
+  // 1. Limpa as mensagens de erro antigas
+  document.getElementById("nameError").innerText = "";
+  document.getElementById("emailError").innerText = "";
+  document.getElementById("phoneError").innerText = "";
+  document.getElementById("cpfError").innerText = "";
+  document.getElementById("dobError").innerText = "";
+
+  // 2. Validações de campos
+  if (step === 2) {
+    const nome = document.getElementById("patientName").value;
+    const email = document.getElementById("patientEmail").value;
+    const phone = document.getElementById("patientPhone").value;
+    const cpf = document.getElementById("patientCPF").value;
+    const dob = document.getElementById("patientDOB").value;
+    let possuiErro = false;
+    if (!nome) { document.getElementById("nameError").innerText = "Preencha o nome"; possuiErro = true; }
+    if (!email) { document.getElementById("emailError").innerText = "Preencha o e-mail"; possuiErro = true; }
+    if (!phone) { document.getElementById("phoneError").innerText = "Preencha o telefone"; possuiErro = true; }
+    if (!cpf) { document.getElementById("cpfError").innerText = "Preencha o CPF"; possuiErro = true; }
+    if (!dob) { document.getElementById("dobError").innerText = "Preencha a data de nascimento"; possuiErro = true; }
+    if (possuiErro) return;
+  }
+  if (step === 3) {
+    const doctor = document.getElementById("doctor").value;
+    let possuiErro = false;
+    if (!doctor) { document.getElementById("doctorError").innerText = "Selecione um médico"; possuiErro = true; }
+    if (possuiErro) return;
+  }
+  if (step === 4) {
+    const consultTime = document.getElementById("consultTime").value;
+    const consultDate = document.getElementById("consultDate").value;
+    const notes = document.getElementById("notes").value;
+    let possuiErro = false;
+    if (!consultDate) { document.getElementById("dateError").innerText = "Selecione a data da consulta"; possuiErro = true; }
+    if (!consultTime) { document.getElementById("timeError").innerText = "Selecione o horário"; possuiErro = true; }
+    if (possuiErro) return;
+  }
+
+  etapaAtual = step;
+
+  // 3. Controla os passos do formulário
+  document.getElementById("step1").style.display = "none";
+  document.getElementById("step2").style.display = "none";
+  document.getElementById("step3").style.display = "none";
+  document.getElementById("step4").style.display = "none";
+
+  // GARANTE que a mensagem de sucesso comece sumida enquanto navega nos passos
+  document.getElementById("successMsg").style.display = "none";
+
+  document.getElementById(`step${step}`).style.display = "block";
+
+  // 4. Atualiza as bolinhas do topo
+  const todosPassos = document.querySelectorAll(".steps .step");
+  todosPassos.forEach((elementoPasso) => {
+    const numeroPasso = parseInt(elementoPasso.getAttribute("data-step"));
+    elementoPasso.classList.remove("active", "done");
+    if (numeroPasso === step) {
+      elementoPasso.classList.add("active");
+    } else if (numeroPasso < step) {
+      elementoPasso.classList.add("done");
+    }
+  });
+
+  // 5. Atualiza a revisão do Passo 4
+  const patientName = document.getElementById("patientName").value;
+  const patientPhone = document.getElementById("patientPhone").value;
+  const patientEmail = document.getElementById("patientEmail").value;
+  const patientCPF = document.getElementById("patientCPF").value;
+  const doctor = document.getElementById("doctor").value;
+  const consultDate = document.getElementById("consultDate").value;
+  const consultTime = document.getElementById("consultTime").value;
+  const consultTypeInput = document.querySelector('input[name="consultType"]:checked');
+  const consultType = consultTypeInput ? consultTypeInput.value : "Presencial";
+  const specialtySelecionada = document.querySelector('input[name="specialty"]:checked');
+  let specialty = "Não selecionada";
+  if (specialtySelecionada) {
+    specialty = specialtySelecionada.parentElement.innerText.trim();
+  }
+
+  document.getElementById("rev-name").innerText = patientName;
+  document.getElementById("rev-phone").innerText = patientPhone;
+  document.getElementById("rev-email").innerText = patientEmail;
+  document.getElementById("rev-cpf").innerText = patientCPF;
+  document.getElementById("rev-specialty").innerText = specialty;
+  document.getElementById("rev-doctor").innerText = doctor;
+  document.getElementById("rev-type").innerText = consultType;
+  document.getElementById("rev-date").innerText = consultDate;
+  document.getElementById("rev-time").innerText = consultTime;
+}
+
+function finalizarAgendamento() {
+  // Esconde o formulário completamente
+  document.getElementById("appointmentForm").style.display = "none";
+  
+  // MOSTRA a mensagem restaurando o layout padrão do CSS (centralizado)
+  document.getElementById("successMsg").style.display = "";
+}
+
+function resetForm() {
+  document.getElementById("appointmentForm").reset();
+  
+  // Esconde a tela de sucesso
+  document.getElementById("successMsg").style.display = "none";
+  
+  // Mostra o formulário novamente
+  document.getElementById("appointmentForm").style.display = "block";
+  
+  const usuarioLogadoNome = document.querySelector(".user-name").innerText;
+  const usuarioLogadoEmail = document.getElementById("patientEmail").value; 
+  if(usuarioLogadoNome !== "Paciente") {
+      document.getElementById("patientName").value = usuarioLogadoNome;
+      document.getElementById("patientEmail").value = usuarioLogadoEmail;
+  }
+  
+  goStep(1);
+}
+
+function mascaraTelefone(input) {
+  let valor = input.value.replace(/\D/g, "");
+  if (valor.length > 11) valor = valor.slice(0, 11);
+  
+  if (valor.length > 7) {
+    input.value = `(${valor.slice(0, 2)}) ${valor.slice(2, 7)}-${valor.slice(7)}`;
+  } else if (valor.length > 2) {
+    input.value = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+  } else if (valor.length > 0) {
+    input.value = `(${valor}`;
+  } else {
+    input.value = "";
+  }
+}
+
+function mascaraCPF(input) {
+  let valor = input.value.replace(/\D/g, "");
+  if (valor.length > 11) valor = valor.slice(0, 11);
+  
+  if (valor.length > 9) {
+    input.value = `${valor.slice(0, 3)}.${valor.slice(3, 6)}.${valor.slice(6, 9)}-${valor.slice(9)}`;
+  } else if (valor.length > 6) {
+    input.value = `${valor.slice(0, 3)}.${valor.slice(3, 6)}.${valor.slice(6)}`;
+  } else if (valor.length > 3) {
+    input.value = `${valor.slice(0, 3)}.${valor.slice(3)}`;
+  } else if (valor.length > 0) {
+    input.value = `${valor}`;
+  } else {
+    input.value = "";
+  }
+}
